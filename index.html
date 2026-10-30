@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="15 道生活偏好题，从 50 座城市里找到最适合你长期定居的那一座。">
+<title>测测你的本命定居城市｜你最适合在哪长期定居？</title>
+<style>
+  :root{
+    --bg:#f4f1ea;
+    --paper:#fffdf9;
+    --ink:#332f2a;
+    --muted:#8b8478;
+    --line:#e7e0d6;
+    --sage:#7d9179;
+    --sage-deep:#6f846c;
+    --sage-soft:#eff3ec;
+    --shadow:0 18px 44px rgba(78,66,52,.08);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    min-height:100dvh;
+    color:var(--ink);
+    background:
+      radial-gradient(900px 520px at 6% -12%, #e7ede2 0%, rgba(231,237,226,0) 62%),
+      radial-gradient(760px 500px at 108% 6%, #f1e4dd 0%, rgba(241,228,221,0) 58%),
+      var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  button{font:inherit;color:inherit;}
+  .app{width:100%;max-width:520px;margin:0 auto;padding:0 22px;}
+  .screen{display:none;}
+  .screen.is-active{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;animation:rise .3s ease both;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){
+    .screen.is-active{animation:none;}
+    .progress-fill,.option,.btn,.toast{transition:none;}
+  }
+
+  /* 封面 */
+  #screen-cover{position:relative;overflow:hidden;}
+  #screen-cover::before,
+  #screen-cover::after{content:"";position:absolute;border-radius:50%;filter:blur(42px);opacity:.6;pointer-events:none;}
+  #screen-cover::before{width:270px;height:270px;background:#dde7d8;top:-90px;right:-110px;}
+  #screen-cover::after{width:230px;height:230px;background:#f0ded5;bottom:8%;left:-130px;}
+  .cover{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;padding:52px 0 34px;}
+  .eyebrow{margin:0 0 18px;font-size:11px;font-weight:600;letter-spacing:.22em;color:var(--sage-deep);}
+  .cover-title{
+    margin:0;
+    font-family:"Songti SC","Noto Serif SC","STSong",serif;
+    font-size:clamp(36px,10.2vw,46px);
+    line-height:1.28;
+    font-weight:600;
+    letter-spacing:.03em;
+  }
+  .cover-sub{margin:14px 0 0;font-size:17px;letter-spacing:.05em;color:#6d665c;}
+  .cover-card{
+    margin:30px 0 22px;
+    padding:20px;
+    border:1px solid rgba(230,223,212,.95);
+    border-radius:20px;
+    background:rgba(255,253,249,.84);
+    box-shadow:0 14px 40px rgba(90,77,62,.06);
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+  }
+  .cover-card p{margin:0;font-size:14.5px;line-height:1.9;color:#57514a;}
+  .cover-card p + p{margin-top:6px;color:#7a736a;}
+  .meta-row{display:flex;align-items:center;gap:10px;margin-bottom:26px;font-size:12px;color:var(--muted);letter-spacing:.06em;}
+  .meta-row i{width:3px;height:3px;border-radius:50%;background:#c9c1b6;}
+  .btn{
+    width:100%;
+    border:0;
+    border-radius:16px;
+    padding:16px 20px;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:.05em;
+    cursor:pointer;
+    transition:transform .15s ease,background .2s ease,opacity .2s ease;
+  }
+  .btn-primary{background:var(--sage);color:#fff;box-shadow:0 10px 24px rgba(125,145,121,.26);}
+  .btn-primary:active{transform:scale(.985);}
+  .btn-ghost{margin-top:2px;background:transparent;border:1px solid #d9d1c6;color:#5e574d;}
+  .btn:disabled{opacity:.38;box-shadow:none;cursor:default;}
+  .cover-note{margin:16px 0 0;text-align:center;font-size:11.5px;letter-spacing:.04em;color:#a09a90;}
+
+  /* 答题 */
+  .quiz{flex:1;display:flex;flex-direction:column;}
+  .quiz-top{
+    position:sticky;
+    top:0;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 0 12px;
+    background:linear-gradient(180deg,rgba(244,241,234,.98) 70%,rgba(244,241,234,.82) 100%);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+  }
+  .icon-btn{
+    flex:0 0 38px;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #e0d8cd;
+    border-radius:50%;
+    background:rgba(255,253,249,.82);
+    font-size:18px;
+    line-height:1;
+    color:#6c655b;
+    cursor:pointer;
+  }
+  .progress-wrap{flex:1;min-width:0;}
+  .progress-meta{display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px;letter-spacing:.12em;color:#9a9388;}
+  .progress-track{height:3px;border-radius:999px;background:#e4ddd2;overflow:hidden;}
+  .progress-fill{height:100%;width:0;border-radius:999px;background:#8ca088;transition:width .3s ease;}
+  .quiz-main{flex:1;padding:26px 0 8px;}
+  .quiz-main.is-in{animation:questionIn .24s ease both;}
+  @keyframes questionIn{from{opacity:.35;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){.quiz-main.is-in{animation:none;}}
+  .q-kicker{margin:0;font-size:11.5px;font-weight:600;letter-spacing:.22em;color:var(--sage-deep);}
+  .q-title{margin:10px 0 0;font-size:24px;font-weight:600;line-height:1.55;letter-spacing:.01em;}
+  .q-hint{margin:12px 0 24px;font-size:12.5px;color:#9d968b;}
+  .options{display:flex;flex-direction:column;gap:12px;}
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:13px;
+    width:100%;
+    padding:15px 16px;
+    text-align:left;
+    font-size:15px;
+    line-height:1.62;
+    color:#4a453e;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-radius:16px;
+    cursor:pointer;
+    transition:border-color .18s ease,background .18s ease,transform .12s ease;
+  }
+  .option:active{transform:scale(.99);}
+  .option-key{
+    flex:0 0 26px;
+    width:26px;
+    height:26px;
+    margin-top:1px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #ddd5ca;
+    border-radius:50%;
+    font-size:11px;
+    color:#9a9388;
+    transition:background .18s ease,border-color .18s ease,color .18s ease;
+  }
+  .option-text{flex:1;}
+  .option.is-selected{border-color:#93a78e;background:var(--sage-soft);}
+  .option.is-selected .option-key{background:var(--sage);border-color:var(--sage);color:#fff;}
+  .quiz-bottom{
+    position:sticky;
+    bottom:0;
+    padding:14px 0 calc(22px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(244,241,234,0),rgba(244,241,234,.97) 34%);
+  }
+
+  /* 结果 */
+  .result{flex:1;padding:44px 0 calc(24px + env(safe-area-inset-bottom));}
+  .result .eyebrow{text-align:center;margin-bottom:20px;}
+  .result-head{text-align:center;padding:6px 0 26px;}
+  .result-label{margin:0 0 10px;font-size:13px;letter-spacing:.08em;color:#8f887d;}
+  .city-name{
+    margin:0;
+    font-family:"Songti SC","Noto Serif SC","STSong",serif;
+    font-size:clamp(44px,13vw,58px);
+    line-height:1.15;
+    font-weight:600;
+    letter-spacing:.05em;
+  }
+  .city-region{margin:10px 0 0;font-size:12px;letter-spacing:.14em;color:#a39c91;}
+  .city-tagline{margin:14px 0 0;font-size:15.5px;letter-spacing:.03em;color:#5d564c;}
+  .match-pill{
+    display:inline-block;
+    margin-top:16px;
+    padding:6px 14px;
+    border:1px solid #dfe7da;
+    border-radius:999px;
+    background:#edf1e9;
+    font-size:12.5px;
+    letter-spacing:.06em;
+    color:#70866c;
+  }
+  .result-card{
+    padding:4px 22px;
+    border:1px solid var(--line);
+    border-radius:22px;
+    background:var(--paper);
+    box-shadow:var(--shadow);
+  }
+  .result-block{padding:18px 0;border-bottom:1px dashed var(--line);}
+  .result-block:last-child{border-bottom:0;}
+  .block-label{margin:0 0 8px;font-size:11.5px;font-weight:600;letter-spacing:.18em;color:#7f937b;}
+  .result-block p{margin:0;font-size:15px;line-height:1.9;color:#4d4740;}
+  .result-note{margin:20px 0 0;text-align:center;font-size:12px;line-height:1.7;letter-spacing:.02em;color:#9d968b;}
+  .result-actions{display:flex;flex-direction:column;gap:10px;margin-top:24px;}
+  .support-card{
+    margin-top:22px;
+    padding:18px;
+    text-align:center;
+    border:1px dashed #ddd5ca;
+    border-radius:18px;
+    background:rgba(255,253,249,.7);
+  }
+  .support-title{margin:0;font-size:13px;font-weight:600;letter-spacing:.08em;color:#6f846c;}
+  .support-text{margin:6px 0 14px;font-size:12.5px;line-height:1.8;color:#8b8478;}
+  .support-card .btn{margin:0;}
+  .result-foot{margin:18px 0 0;text-align:center;font-size:11.5px;letter-spacing:.04em;color:#aaa398;}
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:calc(30px + env(safe-area-inset-bottom));
+    z-index:50;
+    padding:10px 16px;
+    border-radius:999px;
+    background:#3b3731;
+    color:#fff;
+    font-size:13px;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transform:translate(-50%,12px);
+    transition:opacity .25s ease,transform .25s ease;
+  }
+  .toast.is-visible{opacity:1;transform:translate(-50%,0);}
+
+  /* 兑换码 */
+  #screen-gate{position:relative;overflow:hidden;}
+  #screen-gate::before,
+  #screen-gate::after{content:"";position:absolute;border-radius:50%;filter:blur(42px);opacity:.55;pointer-events:none;}
+  #screen-gate::before{width:260px;height:260px;background:#dde7d8;top:-100px;left:-110px;}
+  #screen-gate::after{width:220px;height:220px;background:#f0ded5;bottom:4%;right:-120px;}
+  .gate{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;padding:52px 0 40px;}
+  .gate-title{
+    margin:0;
+    font-family:"Songti SC","Noto Serif SC","STSong",serif;
+    font-size:clamp(32px,8.6vw,40px);
+    line-height:1.3;
+    font-weight:600;
+    letter-spacing:.03em;
+  }
+  .gate-sub{margin:14px 0 0;font-size:15px;line-height:1.8;letter-spacing:.03em;color:#6d665c;}
+  .gate-form{display:flex;flex-direction:column;gap:12px;margin-top:34px;}
+  .gate-label{font-size:11.5px;font-weight:600;letter-spacing:.18em;color:#7f937b;}
+  .gate-input{
+    width:100%;
+    padding:16px 18px;
+    border:1.5px solid var(--line);
+    border-radius:16px;
+    background:var(--paper);
+    font:inherit;
+    font-size:16.5px;
+    letter-spacing:.12em;
+    color:var(--ink);
+    text-transform:uppercase;
+    transition:border-color .18s ease,background .18s ease;
+  }
+  .gate-input::placeholder{color:#b5ada1;letter-spacing:.06em;text-transform:none;}
+  .gate-input:focus{outline:none;border-color:#93a78e;background:#fff;}
+  .gate-input.is-error{border-color:#d3a29a;background:#fdf5f3;}
+  .gate-error{margin:0;font-size:12.5px;line-height:1.6;color:#b06a5d;}
+  .gate-error:empty{display:none;}
+  .gate-foot{margin:24px 0 0;text-align:center;font-size:11.5px;line-height:1.8;letter-spacing:.03em;color:#a09a90;}
+
+  button:focus-visible{outline:3px solid rgba(125,145,121,.35);outline-offset:2px;}
+</style>
+<script>window.FORCE_FREE = true;</script>
+</head>
+<body>
+<div class="app">
+  <section class="screen" id="screen-gate">
+    <div class="gate">
+      <p class="eyebrow">ACCESS · 访问验证</p>
+      <h1 class="gate-title">输入兑换码<br>开始测试</h1>
+      <p class="gate-sub">一单一码，首次进入后 7 天内可在同一设备回看结果。</p>
+      <form class="gate-form" id="gate-form" novalidate>
+        <label class="gate-label" for="gate-code">兑换码</label>
+        <input class="gate-input" id="gate-code" name="code" type="text" inputmode="text"
+          autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"
+          placeholder="例如 CITY-XXXX-XXXX-XXXX" maxlength="40" required>
+        <p class="gate-error" id="gate-error" role="alert" aria-live="polite"></p>
+        <button class="btn btn-primary" id="gate-submit" type="submit">进入测试</button>
+      </form>
+      <p class="gate-foot">兑换码由购买后发放 · 每个码仅限首次使用</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-cover">
+    <div class="cover">
+      <p class="eyebrow">CITY MATCH · 城市性格测试</p>
+      <h1 class="cover-title">测测你的<br>本命定居城市</h1>
+      <p class="cover-sub">你最适合在哪长期定居？</p>
+      <div class="cover-card">
+        <p>不聊玄学，只看你真实的生活偏好。</p>
+        <p>15 道题，约 3 分钟，从 50 座城市里，找出和你同频的那一座。</p>
+      </div>
+      <div class="meta-row">
+        <span>15 道题</span><i></i><span>约 3 分钟</span><i></i><span>50 座城市</span>
+      </div>
+      <button class="btn btn-primary" id="start-btn" type="button">开始测试</button>
+      <p class="cover-note" id="cover-note">结果基于生活偏好匹配，仅供娱乐与参考</p>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-quiz">
+    <div class="quiz">
+      <div class="quiz-top">
+        <button class="icon-btn" id="back-btn" type="button" aria-label="返回上一题">←</button>
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span id="q-index">Q1</span>
+            <span id="q-count">1 / 15</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+      </div>
+      <div class="quiz-main" id="quiz-main">
+        <p class="q-kicker" id="q-kicker">气候</p>
+        <h2 class="q-title" id="q-title"></h2>
+        <p class="q-hint">选最接近你真实状态的一项</p>
+        <div class="options" id="options"></div>
+      </div>
+      <div class="quiz-bottom">
+        <button class="btn btn-primary" id="next-btn" type="button" disabled>下一题</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-result">
+    <div class="result">
+      <p class="eyebrow">YOUR CITY · 匹配结果</p>
+      <div class="result-head">
+        <p class="result-label">你的本命定居城市是</p>
+        <h2 class="city-name" id="city-name"></h2>
+        <p class="city-region" id="city-region"></p>
+        <p class="city-tagline" id="city-tagline"></p>
+        <span class="match-pill" id="match-pill"></span>
+      </div>
+      <div class="result-card">
+        <div class="result-block">
+          <p class="block-label">宜居亮点</p>
+          <p id="city-highlight"></p>
+        </div>
+        <div class="result-block">
+          <p class="block-label">和你很搭</p>
+          <p id="city-personality"></p>
+        </div>
+        <div class="result-block">
+          <p class="block-label">一点小提醒</p>
+          <p id="city-reminder"></p>
+        </div>
+      </div>
+      <p class="result-note" id="result-note"></p>
+      <div class="result-actions">
+        <button class="btn btn-primary" id="copy-btn" type="button">复制分享文案</button>
+        <button class="btn btn-ghost" id="retry-btn" type="button">重新测试</button>
+      </div>
+      <div class="support-card" id="support-card" hidden>
+        <p class="support-title">喜欢这个测试？</p>
+        <p class="support-text">免费版随便测。如果它帮你找到了一点方向，可以请我喝杯奶茶。</p>
+        <a class="btn btn-ghost" id="support-link" href="#" target="_blank" rel="noopener noreferrer">支持作者</a>
+      </div>
+      <p class="result-foot">长按截图，发到小红书和朋友一起测</p>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const DIMS = ['warmth', 'dry', 'slow', 'quiet', 'nature', 'cheap', 'open', 'bold'];
+
+const CITIES = [
+  // 国内 25
+  {
+    name: '成都', region: '中国 · 四川', abroad: false,
+    tagline: '把日子过成一杯盖碗茶',
+    highlight: '生活成本在大城市里算温柔，公园、茶馆和夜宵摊把一天拉得很长。阴天多，但满城的绿意和烟火气很治愈。',
+    personality: '适合不追求时刻紧绷、喜欢朋友和热闹，又想保留一点松弛感的人。',
+    reminder: '冬天湿冷、日照偏少，热门区域也开始卷，租房要挑好朝向。',
+    v: [0.3, -0.6, 0.8, -0.5, 0.3, 0.6, 0.3, 1.0]
+  },
+  {
+    name: '杭州', region: '中国 · 浙江', abroad: false,
+    tagline: '一半湖山，一半野心',
+    highlight: '城市审美在线，西湖和周边山水随时可去，公共空间和咖啡馆都做得舒服。',
+    personality: '适合既想要职业机会，又不愿放弃周末自然和散步的人。',
+    reminder: '房价和通勤不便宜，梅雨季潮湿，旅游旺季热门区域很挤。',
+    v: [0.1, -0.5, 0.2, 0.1, 0.7, -0.5, 0.6, -0.1]
+  },
+  {
+    name: '大理', region: '中国 · 云南', abroad: false,
+    tagline: '苍山洱海之间，时间会慢下来',
+    highlight: '自然就在门口，节奏慢，房租相对友好，很适合远程工作和自由职业。',
+    personality: '适合需要喘口气、能接受小圈子生活、对繁华要求不高的人。',
+    reminder: '医疗和教育资源有限，工作机会少，旅游旺季会突然变吵。',
+    v: [0.3, 0.1, 1.0, 0.7, 1.0, 0.7, 0.5, 0.3]
+  },
+  {
+    name: '昆明', region: '中国 · 云南', abroad: false,
+    tagline: '四季如春，花开得漫不经心',
+    highlight: '气候温和，阳光和鲜花都多，生活成本中等，城市节奏不紧不慢。',
+    personality: '适合怕冷、喜欢稳定天气、想把日子过得简单一点的人。',
+    reminder: '紫外线强，城市活力偏安静，行业机会不如沿海密集。',
+    v: [0.6, 0.2, 0.7, 0.3, 0.8, 0.5, 0.2, 0.3]
+  },
+  {
+    name: '厦门', region: '中国 · 福建', abroad: false,
+    tagline: '海风吹过，小城刚刚好',
+    highlight: '海岸线、绿化和文艺感都在线，城市尺度舒服，走路和骑车都能过得很惬意。',
+    personality: '适合喜欢海、喜欢散步、对精致小吃没有抵抗力的人。',
+    reminder: '房价高、工资一般，台风和潮湿需要适应。',
+    v: [0.7, -0.4, 0.5, 0.2, 0.8, -0.4, 0.4, 0.2]
+  },
+  {
+    name: '青岛', region: '中国 · 山东', abroad: false,
+    tagline: '红瓦绿树，海风有啤酒味',
+    highlight: '夏天特别舒服，海和啤酒都在生活半径里，老城区有踏实的北方生活气。',
+    personality: '适合喜欢四季、海风和爽利人际关系的北方性格。',
+    reminder: '冬天海风冷，就业结构偏传统，热门海岸线旺季人多。',
+    v: [-0.2, 0.3, 0.4, 0.3, 0.7, 0.1, 0.3, 0.6]
+  },
+  {
+    name: '苏州', region: '中国 · 江苏', abroad: false,
+    tagline: '园林之外，是慢慢过的日子',
+    highlight: '离上海很近，但节奏缓一档。园林、运河和古镇都在日常半径里，生活精细。',
+    personality: '适合喜欢安静、讲究生活质感，又不想离机会太远的人。',
+    reminder: '房价不低，梅雨潮湿，夏天闷热。',
+    v: [0.1, -0.6, 0.4, 0.4, 0.3, -0.4, 0.4, -0.2]
+  },
+  {
+    name: '长沙', region: '中国 · 湖南', abroad: false,
+    tagline: '夜还长，粉还热',
+    highlight: '夜生活和小吃密度很高，房价在省会里算友好，年轻人多，城市有股向上的劲。',
+    personality: '适合喜欢热闹、重口、随时能约到朋友的人。',
+    reminder: '夏天湿热，热门街区吵，工作机会集中在少数行业。',
+    v: [0.5, -0.5, 0.1, -0.8, 0.1, 0.7, 0.2, 1.0]
+  },
+  {
+    name: '重庆', region: '中国 · 重庆', abroad: false,
+    tagline: '立体山城，人间烟火',
+    highlight: '江景和夜景独特，吃住成本温柔，城市有很强的市井生命力。',
+    personality: '适合喜欢烟火气、愿意用脚步认识城市的人。',
+    reminder: '坡多梯坎多，夏天很热，阴天不少。',
+    v: [0.5, -0.4, 0.3, -0.6, 0.5, 0.7, 0.2, 1.0]
+  },
+  {
+    name: '西安', region: '中国 · 陕西', abroad: false,
+    tagline: '古城墙下，碳水管够',
+    highlight: '历史感强，生活成本适中，面食和夜市丰富，城市有厚实的文化底子。',
+    personality: '适合喜欢厚重文化、热闹市井和不慌不忙生活的人。',
+    reminder: '冬天干冷有雾霾，夏天热，创新行业机会相对有限。',
+    v: [-0.1, 0.4, 0.3, -0.5, 0.3, 0.5, 0.1, 0.9]
+  },
+  {
+    name: '南京', region: '中国 · 江苏', abroad: false,
+    tagline: '梧桐树下，书卷气很浓',
+    highlight: '梧桐、博物馆和高校密度高，城市有沉静的文化气质，公共资源扎实。',
+    personality: '适合喜欢四季分明、文化生活和稳定节奏的人。',
+    reminder: '夏天闷热，冬天湿冷，房价不低。',
+    v: [0.1, -0.2, 0.3, 0.2, 0.3, -0.3, 0.5, 0.2]
+  },
+  {
+    name: '广州', region: '中国 · 广东', abroad: false,
+    tagline: '务实、好味、不张扬',
+    highlight: '生活便利，美食密度极高，城市包容务实，穿拖鞋也能过得体面。',
+    personality: '适合怕冷、爱吃饭、想低调做事的人。',
+    reminder: '夏天长且湿热，回南天难熬，通勤距离大。',
+    v: [0.9, -0.5, 0.1, -0.6, 0.2, 0.1, 0.5, 0.8]
+  },
+  {
+    name: '深圳', region: '中国 · 广东', abroad: false,
+    tagline: '年轻的城市，海风很急',
+    highlight: '机会多、年轻人多，海边和公园配套好，城市对新鲜事物很友好。',
+    personality: '适合想拼一把、能接受高节奏和陌生人社会的人。',
+    reminder: '房价高，节奏快，文化归属感需要时间慢慢长出来。',
+    v: [0.9, -0.3, -0.8, -0.2, 0.4, -0.9, 0.8, 0.4]
+  },
+  {
+    name: '上海', region: '中国 · 上海', abroad: false,
+    tagline: '秩序之内，生活精致',
+    highlight: '公共服务、展览、咖啡馆和街区生活都很成熟，城市运行得很体面。',
+    personality: '适合喜欢规则、审美和职业机会，也愿意为秩序买单的人。',
+    reminder: '成本高、拥挤，冬天湿冷，租房空间通常不大。',
+    v: [0.1, -0.2, -0.5, -0.2, 0.0, -1.0, 0.8, -0.2]
+  },
+  {
+    name: '北京', region: '中国 · 北京', abroad: false,
+    tagline: '大而辽阔，机会与风沙并存',
+    highlight: '文化资源、机会和人脉密度国内顶级，城市尺度大，能装下很多种人生。',
+    personality: '适合目标明确、喜欢大舞台、能忍受长通勤的人。',
+    reminder: '通勤长，气候干燥，房价高，节奏紧。',
+    v: [-0.5, 0.8, -0.8, -0.2, 0.0, -0.9, 0.7, 0.4]
+  },
+  {
+    name: '珠海', region: '中国 · 广东', abroad: false,
+    tagline: '海边小城，日子很轻',
+    highlight: '海岸线长，人口密度低，去澳门香港方便，适合把生活调成静音。',
+    personality: '适合想要安静海边生活、对热闹要求不高的人。',
+    reminder: '产业机会少，台风多，夜生活偏淡。',
+    v: [0.9, -0.2, 0.7, 0.8, 0.9, -0.1, 0.3, 0.3]
+  },
+  {
+    name: '三亚', region: '中国 · 海南', abroad: false,
+    tagline: '冬天很短，海很长',
+    highlight: '冬天温暖，海和阳光充足，户外生活几乎全年在线。',
+    personality: '适合怕冷、喜欢海边和度假感生活的人。',
+    reminder: '夏天热，物价和旅游依赖度高，医疗教育资源一般。',
+    v: [1.0, -0.2, 0.75, 0.3, 0.95, -0.35, 0.3, 0.2]
+  },
+  {
+    name: '贵阳', region: '中国 · 贵州', abroad: false,
+    tagline: '夏天凉快，日子便宜',
+    highlight: '夏天凉爽，生活成本低，周边自然多，是性价比很高的避暑型城市。',
+    personality: '适合怕热、想低成本生活、喜欢山城烟火的人。',
+    reminder: '冬天湿冷，日照少，机会主要集中在本地。',
+    v: [0.2, -0.3, 0.7, 0.5, 0.9, 0.8, 0.0, 0.9]
+  },
+  {
+    name: '丽江', region: '中国 · 云南', abroad: false,
+    tagline: '雪山脚下，慢慢发呆',
+    highlight: '慢、便宜、自然近，古城和雪山构成很特别的生活背景。',
+    personality: '适合喜欢安静、自然，能接受简单生活的人。',
+    reminder: '旅游化明显，工作机会少，医疗资源一般。',
+    v: [0.4, -0.1, 1.0, 0.8, 1.0, 0.6, 0.4, 0.4]
+  },
+  {
+    name: '宁波', region: '中国 · 浙江', abroad: false,
+    tagline: '港口城市的安静富足',
+    highlight: '经济扎实，城市干净，海岸和古镇都不远，生活有一种低调的富足感。',
+    personality: '适合务实、喜欢安静、不想过度社交的人。',
+    reminder: '城市气质低调，娱乐密度低，梅雨潮湿。',
+    v: [0.3, -0.3, 0.3, 0.5, 0.5, 0.0, 0.4, 0.2]
+  },
+  {
+    name: '福州', region: '中国 · 福建', abroad: false,
+    tagline: '榕树下，温泉与海都不远',
+    highlight: '生活成本适中，温泉、山海和城市烟火都不远，日子过得很顺。',
+    personality: '适合喜欢慢节奏、湿热气候和家常生活的人。',
+    reminder: '夏天湿热，城市存在感偏低，机会一般。',
+    v: [0.8, -0.4, 0.6, 0.2, 0.7, 0.3, 0.2, 0.5]
+  },
+  {
+    name: '无锡', region: '中国 · 江苏', abroad: false,
+    tagline: '太湖边，刚刚好的富足',
+    highlight: '水乡和制造业并重，收入不错，生活舒服，离上海也不远。',
+    personality: '适合喜欢安静、务实、讲究日常舒适度的人。',
+    reminder: '城市偏低调，梅雨潮湿，夜生活不多。',
+    v: [0.2, -0.5, 0.5, 0.6, 0.5, 0.1, 0.3, 0.1]
+  },
+  {
+    name: '武汉', region: '中国 · 湖北', abroad: false,
+    tagline: '江湖气，热干面，直来直去',
+    highlight: '高校多，烟火气足，交通枢纽，生活成本中等，城市很有生命力。',
+    personality: '适合喜欢热闹、直爽、碳水管够的人。',
+    reminder: '夏天极热，冬天湿冷，通勤范围大。',
+    v: [0.5, -0.2, -0.2, -0.6, 0.2, 0.4, 0.3, 0.9]
+  },
+  {
+    name: '威海', region: '中国 · 山东', abroad: false,
+    tagline: '干净的海边，安静的日常',
+    highlight: '海干净，城市安静，房价温柔，适合把生活过得规律一点。',
+    personality: '适合喜欢清净、海边散步、不追求夜生活的人。',
+    reminder: '冬天风大，工作机会少，淡季会有点冷清。',
+    v: [-0.2, 0.4, 0.7, 0.9, 0.8, 0.4, 0.1, 0.2]
+  },
+  {
+    name: '桂林', region: '中国 · 广西', abroad: false,
+    tagline: '山水就在城市里',
+    highlight: '山和水就在日常视野里，生活成本低，节奏慢，适合低物欲生活。',
+    personality: '适合喜欢自然、愿意放慢脚步的人。',
+    reminder: '雨季潮湿，产业机会少，医疗教育一般。',
+    v: [0.7, -0.5, 0.8, 0.6, 1.0, 0.8, 0.1, 0.7]
+  },
+
+  // 国外 25
+  {
+    name: '东京', region: '日本 · 关东', abroad: true,
+    tagline: '秩序、细节与一个人的自在',
+    highlight: '公共交通、治安和城市细节几乎做到极致，独居生活非常友好。',
+    personality: '适合喜欢秩序、独处和精细生活，也能接受慢热社交的人。',
+    reminder: '房租高、空间小，社交距离感强，日语是长期生活的门槛。',
+    v: [0.0, 0.2, -0.4, 0.3, 0.1, -0.6, 0.95, 0.2]
+  },
+  {
+    name: '大阪', region: '日本 · 关西', abroad: true,
+    tagline: '关西的热闹，比东京松弛',
+    highlight: '比东京松弛，吃得好，人更热情，生活成本也稍低一点。',
+    personality: '适合喜欢烟火气、愿意主动交朋友的人。',
+    reminder: '夏天湿热，工作节奏也不轻，语言仍要过关。',
+    v: [0.3, 0.1, -0.2, -0.6, 0.1, -0.3, 0.9, 0.9]
+  },
+  {
+    name: '首尔', region: '韩国 · 首都圈', abroad: true,
+    tagline: '高效率里的潮流与疲惫',
+    highlight: '城市效率高，咖啡、展览和夜生活丰富，治安好，变化很快。',
+    personality: '适合喜欢快节奏、新鲜感和都市生活的人。',
+    reminder: '竞争压力大，房租高，语言和文化门槛不低。',
+    v: [0.0, 0.3, -0.8, -0.4, 0.1, -0.5, 0.85, 0.7]
+  },
+  {
+    name: '曼谷', region: '泰国 · 中部', abroad: true,
+    tagline: '热带城市的松弛与便利',
+    highlight: '生活成本友好，美食和按摩密度高，国际化程度高，日常很便利。',
+    personality: '适合怕冷、喜欢热闹和低成本都市生活的人。',
+    reminder: '堵车、湿热，空气质量会有波动。',
+    v: [1.0, -0.3, 0.2, -0.8, 0.2, 0.7, 0.9, 1.0]
+  },
+  {
+    name: '清迈', region: '泰国 · 北部', abroad: true,
+    tagline: '山边小城，慢慢工作',
+    highlight: '数字游民社区成熟，成本低，自然近，适合远程工作。',
+    personality: '适合自由职业、喜欢慢生活和小圈子的人。',
+    reminder: '烧山季空气差，工作机会少，医疗资源一般。',
+    v: [0.8, 0.0, 0.9, 0.5, 0.9, 0.8, 0.8, 0.5]
+  },
+  {
+    name: '新加坡', region: '新加坡', abroad: true,
+    tagline: '热带里的秩序感',
+    highlight: '安全、干净、国际化，公共服务好，英语通用，生活效率高。',
+    personality: '适合重视秩序、职业机会和国际化环境的人。',
+    reminder: '成本高，湿热，规则多，居住空间偏小。',
+    v: [0.9, -0.4, -0.5, -0.2, 0.3, -1.0, 0.95, 0.3]
+  },
+  {
+    name: '吉隆坡', region: '马来西亚 · 吉隆坡', abroad: true,
+    tagline: '多元文化，性价比很高',
+    highlight: '多元文化、英语通用、生活成本低，能用较小成本体验国际生活。',
+    personality: '适合想低成本试水海外、喜欢多元饮食的人。',
+    reminder: '公共交通一般，湿热，城市管理参差。',
+    v: [0.9, -0.3, 0.0, -0.5, 0.3, 0.8, 0.9, 0.8]
+  },
+  {
+    name: '巴厘岛', region: '印度尼西亚 · 巴厘', abroad: true,
+    tagline: '海岛、社群和自由职业',
+    highlight: '自然和社群生活丰富，远程工作友好，生活节奏很松。',
+    personality: '适合自由职业、喜欢自然和松弛感的人。',
+    reminder: '基础设施一般，医疗有限，旅游区吵。',
+    v: [0.9, -0.2, 0.9, 0.4, 1.0, 0.7, 0.8, 0.3]
+  },
+  {
+    name: '岘港', region: '越南 · 中部', abroad: true,
+    tagline: '海边小城，低成本慢生活',
+    highlight: '海岸线长，生活成本低，节奏慢，适合认真生活而不是拼命工作。',
+    personality: '适合喜欢海、安静和低消费生活的人。',
+    reminder: '雨季明显，工作机会少，语言障碍要面对。',
+    v: [0.9, -0.3, 0.8, 0.7, 0.9, 0.9, 0.7, 0.5]
+  },
+  {
+    name: '悉尼', region: '澳大利亚 · 新南威尔士', abroad: true,
+    tagline: '海港、阳光和户外生活',
+    highlight: '海、阳光和户外生活是日常，城市干净，节奏比想象中松弛。',
+    personality: '适合喜欢户外、阳光和松弛节奏的人。',
+    reminder: '成本很高，离其他地区远，夏天有山火风险。',
+    v: [0.6, 0.2, 0.5, 0.1, 0.85, -0.75, 0.9, 0.2]
+  },
+  {
+    name: '墨尔本', region: '澳大利亚 · 维多利亚', abroad: true,
+    tagline: '咖啡、展览和慢一点的都市',
+    highlight: '咖啡、展览和多元社区让生活有层次，城市气质文艺。',
+    personality: '适合喜欢文化生活和慢节奏都市的人。',
+    reminder: '天气一天四季，成本高，冬天阴冷。',
+    v: [0.0, 0.2, 0.5, 0.0, 0.5, -0.9, 0.9, 0.1]
+  },
+  {
+    name: '奥克兰', region: '新西兰 · 奥克兰', abroad: true,
+    tagline: '海湾与火山，自然很近',
+    highlight: '海和火山公园就在城市里，节奏松弛，户外生活丰富。',
+    personality: '适合喜欢自然、户外和安静生活的人。',
+    reminder: '物价高，工作机会少，离世界其他地区很远。',
+    v: [0.1, -0.1, 0.8, 0.8, 1.0, -0.7, 0.85, 0.0]
+  },
+  {
+    name: '温哥华', region: '加拿大 · 不列颠哥伦比亚', abroad: true,
+    tagline: '山海之间，多元生活',
+    highlight: '山和海都在城市边，华人社区成熟，生活便利且多元。',
+    personality: '适合喜欢自然又不想太孤独的人。',
+    reminder: '房价高，雨季长，冬天阴冷。',
+    v: [0.4, -0.4, 0.3, 0.2, 0.85, -0.8, 0.9, 0.1]
+  },
+  {
+    name: '多伦多', region: '加拿大 · 安大略', abroad: true,
+    tagline: '多元、机会和漫长冬天',
+    highlight: '多元文化，工作机会多，公共服务稳，城市包容度高。',
+    personality: '适合想要机会、包容环境和稳定生活的人。',
+    reminder: '冬天长且冷，通勤远，房租高。',
+    v: [-0.6, 0.2, -0.2, 0.0, 0.3, -0.8, 0.9, 0.2]
+  },
+  {
+    name: '旧金山', region: '美国 · 加利福尼亚', abroad: true,
+    tagline: '创新、海湾和不便宜的梦',
+    highlight: '科技机会和多元文化密集，周边自然很美，城市气质自由。',
+    personality: '适合想在科技行业闯、能接受高成本的人。',
+    reminder: '成本极高，治安分化，通勤堵。',
+    v: [0.2, 0.5, -0.6, -0.1, 0.7, -1.0, 1.0, 0.2]
+  },
+  {
+    name: '西雅图', region: '美国 · 华盛顿州', abroad: true,
+    tagline: '湖山、咖啡和科技公司',
+    highlight: '湖、山、咖啡和科技公司都在附近，夏天美得不像话。',
+    personality: '适合喜欢自然又想保留职业机会的人。',
+    reminder: '雨季长，冬天阴，成本高。',
+    v: [0.0, -0.5, 0.1, 0.4, 0.9, -0.9, 0.9, 0.0]
+  },
+  {
+    name: '纽约', region: '美国 · 纽约州', abroad: true,
+    tagline: '密度、野心和无限可能',
+    highlight: '机会、文化和多样性密度顶级，走路就能遇见世界。',
+    personality: '适合目标感强、喜欢热闹和高密度生活的人。',
+    reminder: '成本高，拥挤，冬天冷。',
+    v: [0.0, 0.1, -1.0, -0.5, 0.1, -1.0, 1.0, 0.7]
+  },
+  {
+    name: '洛杉矶', region: '美国 · 加利福尼亚', abroad: true,
+    tagline: '阳光、海边和分散的自由',
+    highlight: '阳光多，海边和山都近，创意产业强，生活形态自由。',
+    personality: '适合喜欢阳光、自由职业和开车生活的人。',
+    reminder: '必须开车，城市分散，成本高。',
+    v: [0.8, 0.8, -0.2, -0.2, 0.6, -0.9, 0.9, 0.4]
+  },
+  {
+    name: '伦敦', region: '英国 · 英格兰', abroad: true,
+    tagline: '世界在街区里流动',
+    highlight: '文化、博物馆和多元社区密度高，职业机会多，城市层次丰富。',
+    personality: '适合喜欢文化、野心和复杂都市生活的人。',
+    reminder: '成本高，阴雨多，冬天黑得早。',
+    v: [-0.3, -0.2, -0.4, -0.1, 0.1, -1.0, 1.0, 0.3]
+  },
+  {
+    name: '巴黎', region: '法国 · 法兰西岛', abroad: true,
+    tagline: '审美就是日常',
+    highlight: '城市审美和生活艺术在线，街区各有性格，散步本身就是享受。',
+    personality: '适合喜欢美、散步和慢生活的人。',
+    reminder: '成本高，办事效率慢，治安分化。',
+    v: [0.0, 0.1, 0.1, -0.2, 0.2, -0.9, 1.0, 0.2]
+  },
+  {
+    name: '柏林', region: '德国 · 柏林州', abroad: true,
+    tagline: '自由、便宜、不精致',
+    highlight: '相对可负担，创意和亚文化活跃，包容度高，不卷精致。',
+    personality: '适合喜欢自由、个性和不追求精致生活的人。',
+    reminder: '冬天阴冷，办事慢，德语很有用。',
+    v: [-0.5, 0.1, 0.3, -0.2, 0.4, -0.5, 1.0, 0.5]
+  },
+  {
+    name: '阿姆斯特丹', region: '荷兰 · 北荷兰', abroad: true,
+    tagline: '单车、运河和开放空气',
+    highlight: '单车友好，城市尺度小，包容开放，生活节奏比想象中慢。',
+    personality: '适合喜欢自由、骑车和慢节奏的人。',
+    reminder: '房源紧张，天气多雨，风大。',
+    v: [-0.2, -0.3, 0.5, 0.2, 0.5, -0.8, 1.0, 0.1]
+  },
+  {
+    name: '里斯本', region: '葡萄牙 · 里斯本', abroad: true,
+    tagline: '阳光、旧城和慢日子',
+    highlight: '阳光多，成本比西欧低，海和旧城都美，生活节奏松弛。',
+    personality: '适合喜欢阳光、旧城气质和慢生活的人。',
+    reminder: '工资低，旅游区拥挤，夏季干热。',
+    v: [0.8, 0.4, 0.7, 0.3, 0.7, -0.2, 0.95, 0.4]
+  },
+  {
+    name: '巴塞罗那', region: '西班牙 · 加泰罗尼亚', abroad: true,
+    tagline: '海、美食和旺盛的生命力',
+    highlight: '地中海气候，海滩和美食都在日常里，城市很有生命力。',
+    personality: '适合喜欢热闹、阳光和社交的人。',
+    reminder: '旅游区吵，收入不高，治安要留意。',
+    v: [0.9, 0.2, 0.4, -0.4, 0.6, -0.4, 0.95, 0.7]
+  },
+  {
+    name: '苏黎世', region: '瑞士 · 苏黎世州', abroad: true,
+    tagline: '湖山之间的秩序与安静',
+    highlight: '湖、山、治安和公共服务顶级，生活品质高，节奏规律。',
+    personality: '适合喜欢安静、秩序和高品质生活的人。',
+    reminder: '成本极高，社交慢热，生活节奏偏规律。',
+    v: [-0.2, 0.2, 0.5, 0.9, 0.9, -1.0, 0.95, -0.2]
+  }
+];
+
+const QUESTIONS = [
+  {
+    kicker: '气候',
+    title: '冬天的时候，你最想住在哪种地方？',
+    options: [
+      { text: '越暖和越好，最好冬天也能穿单衣', s: { warmth: 1 } },
+      { text: '喜欢四季分明，春天有花秋天有叶', s: { warmth: -0.2 } },
+      { text: '喜欢凉爽干燥，讨厌黏糊糊的夏天', s: { warmth: -1, dry: 0.6 } },
+      { text: '气候不是重点，室内舒服就行', s: { warmth: 0.2 } }
+    ]
+  },
+  {
+    kicker: '气候',
+    title: '如果一年里有几个月的回南天或梅雨季，你能接受吗？',
+    options: [
+      { text: '完全能接受，湿润一点皮肤还舒服', s: { dry: -1 } },
+      { text: '可以接受，但希望有干爽的季节喘口气', s: { dry: -0.4 } },
+      { text: '有点难受，会尽量选干燥一点的城市', s: { dry: 0.6 } },
+      { text: '完全不行，潮湿会让我心情变差', s: { dry: 1 } }
+    ]
+  },
+  {
+    kicker: '节奏',
+    title: '你理想中工作日的生活节奏是？',
+    options: [
+      { text: '慢一点，中午最好还能回家吃个饭', s: { slow: 1 } },
+      { text: '张弛有度，忙的时候忙，闲的时候真闲', s: { slow: 0.3 } },
+      { text: '喜欢高效紧凑，太闲反而会慌', s: { slow: -0.7 } },
+      { text: '越快越好，节奏快才觉得在活着', s: { slow: -1 } }
+    ]
+  },
+  {
+    kicker: '氛围',
+    title: '下班之后的街区，你更希望是？',
+    options: [
+      { text: '热闹，下楼就有夜市、人群和小店', s: { quiet: -1 } },
+      { text: '热闹可以，但回家要有一道安静的门', s: { quiet: -0.3 } },
+      { text: '安静一点，能听到鸟叫和树叶声', s: { quiet: 0.7 } },
+      { text: '越清净越好，人少是很大的加分项', s: { quiet: 1 } }
+    ]
+  },
+  {
+    kicker: '环境',
+    title: '周末醒来，你更想推开门看到？',
+    options: [
+      { text: '山、海、湖、草地，自然越多越好', s: { nature: 1 } },
+      { text: '城市边缘有座郊野公园就足够', s: { nature: 0.4 } },
+      { text: '商场、展馆、咖啡馆，城市生活更吸引我', s: { nature: -0.6 } },
+      { text: '便利第一，楼下什么都有最重要', s: { nature: -1 } }
+    ]
+  },
+  {
+    kicker: '通勤',
+    title: '每天通勤，你能接受的上限是？',
+    options: [
+      { text: '步行或骑车 20 分钟内，最好不用挤地铁', s: { slow: 0.6, cheap: 0.3 } },
+      { text: '半小时以内，路上能听听播客', s: { slow: 0.2, cheap: 0.1 } },
+      { text: '一小时以内，只要工作值得', s: { slow: -0.3, cheap: -0.2 } },
+      { text: '通勤不是问题，机会和收入更重要', s: { slow: -0.6, cheap: -0.5 } }
+    ]
+  },
+  {
+    kicker: '成本',
+    title: '关于收入和生活成本，你更接近哪种？',
+    options: [
+      { text: '收入一般也行，够花就好，房价一定要友好', s: { cheap: 1 } },
+      { text: '希望收入中上，房价也适中，平衡最重要', s: { cheap: 0.3 } },
+      { text: '愿意为了高收入，承受更高的房租和物价', s: { cheap: -0.7 } },
+      { text: '哪里赚钱多去哪里，成本不是首要考虑', s: { cheap: -1 } }
+    ]
+  },
+  {
+    kicker: '口味',
+    title: '一座城市的美食，对你来说意味着？',
+    options: [
+      { text: '清淡精致，食材新鲜比调味重要', s: { bold: -1 } },
+      { text: '家常顺口，不挑，能好好吃饭就行', s: { bold: -0.2 } },
+      { text: '喜欢重口，无辣不欢，有锅气才香', s: { bold: 0.8 } },
+      { text: '夜宵和烟火气是灵魂，深夜也有得吃', s: { bold: 1 } }
+    ]
+  },
+  {
+    kicker: '季节',
+    title: '你最能忍受哪一种季节？',
+    options: [
+      { text: '漫长的夏天，阳光多，衣服穿得少', s: { warmth: 0.8, dry: 0.3 } },
+      { text: '秋天，凉快、干燥、天很高', s: { warmth: -0.2, dry: 0.4 } },
+      { text: '冬天和雪，冷一点没关系', s: { warmth: -1, dry: 0.2 } },
+      { text: '四季不分明也能接受，舒服最重要', s: { warmth: 0.3 } }
+    ]
+  },
+  {
+    kicker: '人群',
+    title: '你希望生活的城市是什么气质？',
+    options: [
+      { text: '越多元越好，各种口音和生活方式都有', s: { open: 0.8 } },
+      { text: '有外地人，也保留本地原本的味道', s: { open: 0.2 } },
+      { text: '喜欢熟悉的人情社会，出门都是熟人', s: { open: -0.6 } },
+      { text: '越传统越有安全感，不想适应太多新东西', s: { open: -1 } }
+    ]
+  },
+  {
+    kicker: '方向',
+    title: '如果条件允许，你会考虑去国外长期生活吗？',
+    options: [
+      { text: '完全不考虑，只想在国内', s: { open: -0.8, scope: 'domestic' } },
+      { text: '优先国内，但也可以看看外面的选项', s: { open: -0.2, scope: 'domestic' } },
+      { text: '都可以，哪座城市适合就去哪', s: { open: 0.5, scope: 'all' } },
+      { text: '更想出国，想换一种生活方式', s: { open: 1, scope: 'intl' } }
+    ]
+  },
+  {
+    kicker: '社交',
+    title: '在一个新城市，你希望怎么建立关系？',
+    options: [
+      { text: '需要熟人网络，最好有朋友介绍', s: { open: -0.6 } },
+      { text: '有几个聊得来的朋友就够', s: { open: 0.1 } },
+      { text: '喜欢认识新朋友，愿意主动社交', s: { open: 0.6 } },
+      { text: '陌生人多的地方反而更自在', s: { open: 0.9 } }
+    ]
+  },
+  {
+    kicker: '工作',
+    title: '你的工作形态更接近？',
+    options: [
+      { text: '远程办公，住在哪里比公司在哪重要', s: { cheap: 0.5, slow: 0.4 } },
+      { text: '本地有一份稳定工作就很好', s: { cheap: 0.3, slow: 0.1 } },
+      { text: '需要行业机会多，换工作不用搬家', s: { cheap: -0.5, slow: -0.3 } },
+      { text: '必须是一线级别的机会，其他可以妥协', s: { cheap: -1, slow: -0.5 } }
+    ]
+  },
+  {
+    kicker: '居住',
+    title: '关于住的地方，你最想要？',
+    options: [
+      { text: '带院子或大阳台，能种花晒太阳', s: { cheap: 0.5, nature: 0.5, quiet: 0.3 } },
+      { text: '小两居，够住、干净、采光好', s: { cheap: 0.1, nature: 0.1 } },
+      { text: '公寓也可以，地段和便利更重要', s: { cheap: -0.5, nature: -0.3 } },
+      { text: '核心区的小房子也能接受，位置第一', s: { cheap: -1, nature: -0.6 } }
+    ]
+  },
+  {
+    kicker: '选择',
+    title: '面对生活，你更接近哪种状态？',
+    options: [
+      { text: '喜欢安稳可预期，最好一眼看到五年后', s: { slow: 0.4, open: -0.4 } },
+      { text: '可以有一点变化，但大方向要稳', s: { slow: 0.1 } },
+      { text: '喜欢新鲜感，愿意为变化承担一点风险', s: { slow: -0.4, open: 0.4 } },
+      { text: '越未知越兴奋，人生就该多试试', s: { slow: -0.8, open: 0.8 } }
+    ]
+  }
+];
+
+function hashString(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+// 每个维度的理论最大正向/负向得分，用来把原始分映射到 [-1, 1]
+function buildDimStats() {
+  const stats = {};
+  DIMS.forEach(function (dim) {
+    let pos = 0;
+    let neg = 0;
+    QUESTIONS.forEach(function (question) {
+      const values = question.options.map(function (option) {
+        return typeof option.s[dim] === 'number' ? option.s[dim] : 0;
+      });
+      const max = Math.max.apply(null, values);
+      const min = Math.min.apply(null, values);
+      if (max > 0) pos += max;
+      if (min < 0) neg += min;
+    });
+    stats[dim] = { pos: pos || 1, neg: Math.abs(neg) || 1 };
+  });
+  return stats;
+}
+
+const DIM_STATS = buildDimStats();
+
+function computeResult(answers) {
+  const totals = {};
+  DIMS.forEach(function (dim) { totals[dim] = 0; });
+
+  answers.forEach(function (answerIndex, questionIndex) {
+    if (answerIndex == null) return;
+    const option = QUESTIONS[questionIndex].options[answerIndex];
+    if (!option) return;
+    DIMS.forEach(function (dim) {
+      if (typeof option.s[dim] === 'number') totals[dim] += option.s[dim];
+    });
+  });
+
+  const vector = DIMS.map(function (dim) {
+    const stats = DIM_STATS[dim];
+    const raw = totals[dim];
+    const value = raw >= 0 ? raw / stats.pos : raw / stats.neg;
+    return Math.max(-1, Math.min(1, value));
+  });
+
+  const scopeOption = answers[10] != null ? QUESTIONS[10].options[answers[10]] : null;
+  const scope = scopeOption && scopeOption.s.scope ? scopeOption.s.scope : 'all';
+  const pool = CITIES.filter(function (city) {
+    if (scope === 'domestic') return !city.abroad;
+    if (scope === 'intl') return city.abroad;
+    return true;
+  });
+
+  const seed = hashString(answers.join('-'));
+  let best = null;
+
+  pool.forEach(function (city) {
+    let distance = 0;
+    let affinity = 0;
+    for (let i = 0; i < DIMS.length; i++) {
+      const diff = vector[i] - city.v[i];
+      const weight = DIMS[i] === 'bold' ? 0.7 : 1;
+      distance += weight * diff * diff;
+      const aligned = vector[i] * city.v[i];
+      if (aligned > 0) affinity += aligned;
+    }
+    // 除了“最不违和”，也奖励强偏好与城市特质的同向匹配，避免结果总是落在中间城市
+    const jitter = ((seed + city.name.charCodeAt(0)) % 100) / 1000000;
+    const score = -distance + affinity * 0.16 + jitter;
+    if (!best || score > best.score) {
+      best = { city: city, score: score, distance: distance };
+    }
+  });
+
+  const meanSq = best.distance / 7.7;
+  const match = Math.max(60, Math.min(96, Math.round(97 - 22 * Math.sqrt(meanSq))));
+
+  return { city: best.city, match: match, vector: vector, scope: scope };
+}
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.CityTest = { DIMS: DIMS, CITIES: CITIES, QUESTIONS: QUESTIONS, computeResult: computeResult };
+}
+
+if (typeof document !== 'undefined') {
+  // 免费版配置：填入赞赏页/发卡页链接后，免费版结果页会显示“支持作者”
+  var SUPPORT_URL = '';
+
+  var FREE_MODE = (typeof window !== 'undefined' && window.FORCE_FREE === true) || (function () {
+    try {
+      if (new URLSearchParams(location.search).get('mode') === 'free') return true;
+    } catch (error) {}
+    return /^\/free(\.html)?\/?$/.test(location.pathname);
+  })();
+
+  var state = {
+    q: 0,
+    answers: new Array(QUESTIONS.length).fill(null),
+    result: null,
+    shareText: ''
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var screens = {
+    gate: $('screen-gate'),
+    cover: $('screen-cover'),
+    quiz: $('screen-quiz'),
+    result: $('screen-result')
+  };
+  var quizMain = $('quiz-main');
+  var optionsEl = $('options');
+  var nextBtn = $('next-btn');
+  var progressFill = $('progress-fill');
+  var toastEl = $('toast');
+  var toastTimer = null;
+
+  function showScreen(name) {
+    Object.keys(screens).forEach(function (key) {
+      screens[key].classList.toggle('is-active', key === name);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function animateQuiz() {
+    quizMain.classList.remove('is-in');
+    void quizMain.offsetWidth;
+    quizMain.classList.add('is-in');
+  }
+
+  function renderQuestion() {
+    var question = QUESTIONS[state.q];
+    $('q-kicker').textContent = question.kicker;
+    $('q-title').textContent = question.title;
+    $('q-index').textContent = 'Q' + (state.q + 1);
+    $('q-count').textContent = (state.q + 1) + ' / ' + QUESTIONS.length;
+    progressFill.style.width = (((state.q + 1) / QUESTIONS.length) * 100) + '%';
+
+    optionsEl.innerHTML = '';
+    question.options.forEach(function (option, index) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      var selected = state.answers[state.q] === index;
+      btn.className = 'option' + (selected ? ' is-selected' : '');
+      btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+
+      var key = document.createElement('span');
+      key.className = 'option-key';
+      key.textContent = 'ABCD'[index];
+
+      var text = document.createElement('span');
+      text.className = 'option-text';
+      text.textContent = option.text;
+
+      btn.appendChild(key);
+      btn.appendChild(text);
+      btn.addEventListener('click', function () {
+        state.answers[state.q] = index;
+        Array.prototype.forEach.call(optionsEl.children, function (child, childIndex) {
+          var isSelected = childIndex === index;
+          child.classList.toggle('is-selected', isSelected);
+          child.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        });
+        nextBtn.disabled = false;
+      });
+      optionsEl.appendChild(btn);
+    });
+
+    nextBtn.disabled = state.answers[state.q] == null;
+    nextBtn.textContent = state.q === QUESTIONS.length - 1 ? '查看我的城市' : '下一题';
+    animateQuiz();
+  }
+
+  function startQuiz(reset) {
+    if (reset) {
+      state.q = 0;
+      state.answers = new Array(QUESTIONS.length).fill(null);
+      state.result = null;
+    }
+    renderQuestion();
+    showScreen('quiz');
+  }
+
+  function renderSupport() {
+    var card = $('support-card');
+    var link = $('support-link');
+    if (!card || !link) return;
+    if (!FREE_MODE || !SUPPORT_URL) {
+      card.hidden = true;
+      return;
+    }
+    link.href = SUPPORT_URL;
+    card.hidden = false;
+  }
+
+  function showResult() {
+    var result = computeResult(state.answers);
+    state.result = result;
+    var city = result.city;
+
+    $('city-name').textContent = city.name;
+    $('city-region').textContent = city.region;
+    $('city-tagline').textContent = city.tagline;
+    $('match-pill').textContent = '契合度 ' + result.match + '%';
+    $('city-highlight').textContent = city.highlight;
+    $('city-personality').textContent = city.personality;
+    $('city-reminder').textContent = city.reminder;
+    $('result-note').textContent = city.abroad
+      ? '这座城市在境外，落地前记得把签证、语言和医保算进真实成本。'
+      : '结果基于生活偏好匹配，仅供娱乐与参考。';
+
+    var shareLink = '';
+    if (location.protocol === 'http:' || location.protocol === 'https:') {
+      shareLink = FREE_MODE
+        ? location.href.split('#')[0]
+        : location.origin + location.pathname;
+    }
+
+    state.shareText = '我的本命定居城市是' + city.name + '｜' + city.tagline + '\n\n'
+      + '宜居亮点：' + city.highlight + '\n'
+      + '和我很搭：' + city.personality + '\n'
+      + '小提醒：' + city.reminder + '\n\n'
+      + '15 道题，测测你的本命定居城市。'
+      + (shareLink ? '\n' + shareLink : '');
+
+    renderSupport();
+    showScreen('result');
+  }
+
+  function toast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove('is-visible');
+    }, 2000);
+  }
+
+  function fallbackCopy(text) {
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.style.position = 'fixed';
+    area.style.top = '-1000px';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+    document.body.removeChild(area);
+    toast(ok ? '已复制，去小红书分享吧' : '复制失败，请长按页面截图');
+  }
+
+  function copyShareText() {
+    if (!state.shareText) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(state.shareText).then(function () {
+        toast('已复制，去小红书分享吧');
+      }).catch(function () {
+        fallbackCopy(state.shareText);
+      });
+    } else {
+      fallbackCopy(state.shareText);
+    }
+  }
+
+  var gateForm = $('gate-form');
+  var gateCode = $('gate-code');
+  var gateError = $('gate-error');
+  var gateSubmit = $('gate-submit');
+
+  function setGateError(message) {
+    gateError.textContent = message || '';
+    gateCode.classList.toggle('is-error', Boolean(message));
+    if (message) gateCode.focus();
+  }
+
+  function enterTest() {
+    showScreen('cover');
+  }
+
+  function checkSession() {
+    if (FREE_MODE || location.protocol === 'file:') {
+      enterTest();
+      return;
+    }
+    fetch('/api/session', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (res) {
+        if (res.ok) enterTest();
+        else showScreen('gate');
+      })
+      .catch(function () { showScreen('gate'); });
+  }
+
+  gateForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (gateSubmit.disabled) return;
+    var code = gateCode.value.trim().toUpperCase();
+    if (!code) {
+      setGateError('请输入兑换码');
+      return;
+    }
+    setGateError('');
+    gateSubmit.disabled = true;
+    gateSubmit.textContent = '验证中…';
+
+    fetch('/api/redeem', {
+      method: 'POST',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code })
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        return { ok: res.ok, status: res.status, data: data };
+      });
+    }).then(function (result) {
+      gateSubmit.disabled = false;
+      gateSubmit.textContent = '进入测试';
+      if (result.ok) {
+        enterTest();
+        return;
+      }
+      var messages = {
+        400: '兑换码格式不正确，请核对后重试',
+        404: '没有找到这个兑换码，请核对后重试',
+        409: '这个兑换码已经被使用过了',
+        410: '这个兑换码已过期或停用，请联系卖家',
+        429: '操作太频繁，请稍后再试'
+      };
+      setGateError(messages[result.status] || '验证失败，请稍后重试');
+    }).catch(function () {
+      gateSubmit.disabled = false;
+      gateSubmit.textContent = '进入测试';
+      setGateError('网络异常，请稍后重试');
+    });
+  });
+
+  if (FREE_MODE) {
+    $('cover-note').textContent = '免费版 · 仅供娱乐与参考，欢迎分享给朋友';
+  }
+
+  checkSession();
+
+  $('start-btn').addEventListener('click', function () { startQuiz(false); });
+
+  $('back-btn').addEventListener('click', function () {
+    if (state.q > 0) {
+      state.q -= 1;
+      renderQuestion();
+    } else {
+      showScreen('cover');
+    }
+  });
+
+  nextBtn.addEventListener('click', function () {
+    if (state.answers[state.q] == null) return;
+    if (state.q < QUESTIONS.length - 1) {
+      state.q += 1;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  });
+
+  $('copy-btn').addEventListener('click', copyShareText);
+  $('retry-btn').addEventListener('click', function () { startQuiz(true); });
+}
+</script>
+</body>
+</html>
